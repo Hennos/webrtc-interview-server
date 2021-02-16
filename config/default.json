@@ -1,3 +1,4 @@
 {
-  "port": 5454
+  "host": "localhost",
+  "port": 443
 }

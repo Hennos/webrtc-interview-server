@@ -4,23 +4,41 @@
  * Module dependencies.
  */
 
-const app = require('../app');
-const debug = require('debug')('webrtc-interview-server:server');
-const http = require('http');
+const https = require('https');
 const config = require('config');
+const debug = require('debug')('webrtc-interview-server:server');
+
+const app = require('../app');
+
+const createDataTransport = require('../transport');
+const setClientsConnections = require('../connections');
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || config.port || '3000');
+const port = normalizePort(process.env.PORT || config.port || '3443');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const credentials = app.get('credentials');
+const server = https.createServer(credentials, app);
+
+/**
+ * Create data tranport channel
+ */
+
+const transport = createDataTransport(server, { cors: { origin: '*' } });
+app.set('transport', transport);
+
+/**
+ * Set clients connections handler
+ */
+
+setClientsConnections(app);
 
 /**
  * Listen on provided port, on all network interfaces.
